@@ -73,7 +73,7 @@ Kickstart Guide:
    NOTE: Look for lines like this
 
     Throughout the file. These are for you, the reader, to help you understand what is happening.
-    Feel free to delete them once you know what you're doing, but they should serve as a guide
+    Feel free to delete them once you know what you're doing, but they should serve as a guideinitinit
     for when you are first encountering a few different constructs in your Neovim config.
 
 If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
@@ -99,7 +99,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -110,7 +110,7 @@ do
   vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -165,7 +165,7 @@ do
   vim.o.cursorline = true
 
   -- Minimal number of screen lines to keep above and below the cursor.
-  vim.o.scrolloff = 10
+  vim.o.scrolloff = 20
 
   -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
   -- instead raise a dialog asking if you wish to save the current file(s)
@@ -185,6 +185,12 @@ do
   --  See `:help hlsearch`
   vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
+  -- Custom stuff
+  vim.keymap.set('n', '<space><space>x', '<cmd>source %<CR>')
+  vim.keymap.set('n', '<space>x', ':.lua<CR>')
+  vim.keymap.set('v', '<space>x', ':lua<CR>')
+  vim.keymap.set('i', 'jj', '<Esc>')
+
   -- Diagnostic Config & Keymaps
   --  See `:help vim.diagnostic.Opts`
   vim.diagnostic.config {
@@ -194,8 +200,8 @@ do
     underline = { severity = { min = vim.diagnostic.severity.WARN } },
 
     -- Can switch between these as you prefer
-    virtual_text = true, -- Text shows up at the end of the line
-    virtual_lines = false, -- Text shows up underneath the line, with virtual lines
+    virtual_text = false, -- Text shows up at the end of the line
+    virtual_lines = true, -- Text shows up underneath the line, with virtual lines
 
     -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
     jump = {
@@ -209,6 +215,8 @@ do
     },
   }
 
+  vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previouse [D]iagnostic message' })
+  vim.keymap.set('n', 'd]', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
@@ -692,16 +700,17 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    -- clangd = {},
+    clangd = {},
     -- gopls = {},
     -- pyright = {},
+    black = {},
+    pylint = {},
     -- rust_analyzer = {},
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
     --    https://github.com/pmizio/typescript-tools.nvim
     --
     -- But for many setups, the LSP (`ts_ls`) will work just fine
-    -- ts_ls = {},
 
     stylua = {}, -- Used to format Lua code
 
@@ -782,8 +791,8 @@ do
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
-        -- lua = true,
-        -- python = true,
+        lua = true,
+        python = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
@@ -798,7 +807,7 @@ do
     formatters_by_ft = {
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
+      python = { 'black' },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -824,8 +833,8 @@ do
   --    See the README about individual language/framework/plugin snippets:
   --    https://github.com/rafamadriz/friendly-snippets
   --
-  -- vim.pack.add { gh 'rafamadriz/friendly-snippets' }
-  -- require('luasnip.loaders.from_vscode').lazy_load()
+  vim.pack.add { gh 'rafamadriz/friendly-snippets' }
+  require('luasnip.loaders.from_vscode').lazy_load()
 
   -- [[ Autocomplete Engine ]]
   vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
@@ -967,16 +976,16 @@ do
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug'
-  -- require 'kickstart.plugins.indent_line'
+  require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
   -- require 'kickstart.plugins.neo-tree'
-  -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
+  require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- require 'custom.plugins'
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
